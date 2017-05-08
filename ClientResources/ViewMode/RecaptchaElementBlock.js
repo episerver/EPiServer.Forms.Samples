@@ -46,11 +46,13 @@ function initRecaptchaElements() {
         $(".Form__Element.FormRecaptcha").each(function (index, element) {
             var $element = $(element),
                 $widgetContainer = $(".g-recaptcha", $element),
-                siteKey = $element.data("epiforms-sitekey");
+                siteKey = $element.data("epiforms-sitekey"),
+                initialized = $element.data("epiforms-initialized");
 
-            if ($widgetContainer.length == 1 && siteKey) {
+            if ($widgetContainer.length == 1 && siteKey && !initialized) {
                 var widgetId = grecaptcha.render($widgetContainer[0], { sitekey: siteKey, callback: onVerify($element) });
                 $element.data("epiforms-recaptcha-widgetid", widgetId);
+                $element.data("epiforms-recaptcha-initialized", true);
             }
         });
 
