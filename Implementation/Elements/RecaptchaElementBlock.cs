@@ -54,7 +54,7 @@ namespace EPiServer.Forms.Samples.Implementation.Elements
         public override object GetSubmittedValue()
         {
             var submitData = HttpContext.Current.Request.HttpMethod == "POST" ? HttpContext.Current.Request.Form : HttpContext.Current.Request.QueryString;
-            return submitData[this.Content.GetElementName()];
+            return submitData["g-recaptcha-response"];
         }
 
         #endregion
