@@ -47,7 +47,7 @@ function initRecaptchaElements() {
             var $element = $(element),
                 $widgetContainer = $(".g-recaptcha", $element),
                 siteKey = $element.data("epiforms-sitekey"),
-                initialized = $element.data("epiforms-initialized");
+                initialized = $element.data("epiforms-recaptcha-initialized");
 
             if ($widgetContainer.length == 1 && siteKey && !initialized) {
                 var widgetId = grecaptcha.render($widgetContainer[0], { sitekey: siteKey, callback: onVerify($element) });
