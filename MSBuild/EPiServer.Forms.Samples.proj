@@ -1,0 +1,92 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
+
+    <PropertyGroup>
+        <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+        <OutDir Condition="'$(OutputPathOutDir)' == ''">$(MSBuildProjectDirectory)\..</OutDir>
+        <SamplesInstallerSourcePath Condition="'$(OutDir)' != ''">$(OutDir)\SamplesInstallerSource</SamplesInstallerSourcePath>
+        <!--We use a share folder to store all msbuild related resources (tools, automate tool, shared target, ...) -->
+        <MSBuildNuGetExe>$(MSBuildProjectDirectory)\nuget.exe</MSBuildNuGetExe>
+        <SamplesNuSpecFile>$(MSBuildProjectDirectory)\EPiServer.Forms.Samples.Compiled.nuspec</SamplesNuSpecFile>
+    </PropertyGroup>
+
+
+    <UsingTask AssemblyFile="EPiServer.Build.Tasks.dll" TaskName="GetVersion" />
+    <UsingTask AssemblyFile="EPiServer.Build.Tasks.dll" TaskName="ReplaceInFile" />
+
+    <!-- $(MSBuildShareDependency), @CssFiles and @LessFiles must be defined in each Addon.
+        Note: Relative path to dotless.exe does not work, so we use absolute path. -->
+    <Target Name="BuildLessFiles" DependsOnTargets="">
+        <ItemGroup>
+            <LessFiles Include="$(MSBuildProjectDirectory)\..\**\EPiServerFormsSamples.less" />
+            <LessFiles Include="$(MSBuildProjectDirectory)\..\**\FormsSamples.less" />
+        </ItemGroup>
+
+        <Attrib Condition="@(CssFiles) != ''" ReadOnly="false" Files="@(CssFiles)" />
+        <!-- clear *.css ReadOnly attributes, so the dotlessCompiler can do its job -->
+        <Exec Condition="@(LessFiles) != ''"
+              Command="&quot;$(MSBuildProjectDirectory)\dotless.Compiler.exe&quot; -m &quot;%(LessFiles.Identity)&quot;" />
+    </Target>
+
+    <Target Name="CleanOutput">
+        <!--Clean the output directory-->
+        <RemoveDir Directories="$(SamplesInstallerSourcePath)" />
+    </Target>
+    
+    <Target Name="BuildSolution">
+        <MSBuild Projects="$(MSBuildProjectDirectory)\..\EPiServer.Forms.Samples.csproj" Properties="Configuration=$(Configuration);" Targets="Rebuild" />
+    </Target>
+
+    <Target Name="BuildPackages">
+
+        <!-- Build groups of the actual content of the site
+            Note: Need to define these items inside this target in order to evaluate the compiled .less -> .css files -->
+        <ItemGroup>
+            <!--EPISERVER FORMS SAMPLE package-->
+            <SamplesConfigFiles Include="$(MSBuildProjectDirectory)\..\**\module.config;
+                                        $(MSBuildProjectDirectory)\..\**\Web.config"
+                                Exclude="$(MSBuildProjectDirectory)\..\packages\**" />
+            <SamplesBinFiles Include="$(MSBuildProjectDirectory)\..\**\EPiServer.Forms.Samples.dll" />
+            <SamplesClientResources Include="$(MSBuildProjectDirectory)\..\ClientResources\**\*.js;
+                                        $(MSBuildProjectDirectory)\..\ClientResources\**\*.html;
+                                        $(MSBuildProjectDirectory)\..\ClientResources\**\*.css;
+                                        $(MSBuildProjectDirectory)\..\ClientResources\**\*.png;
+                                        $(MSBuildProjectDirectory)\..\ClientResources\**\*.gif" />
+            <SamplesViewFiles Include="$(MSBuildProjectDirectory)\..\**\*.as?x;
+                                        $(MSBuildProjectDirectory)\..\**\*.cshtml;
+                                        $(MSBuildProjectDirectory)\..\**\*.master;" />
+            <SamplesLanguageFiles Include="$(MSBuildProjectDirectory)\..\EmbeddedLangFiles\*.xml" />
+            <SamplesMiscRootFiles Include="$(MSBuildProjectDirectory)\..\*.txt" />
+
+            <SNToolPaths Include="$(SDK40ToolsPath)sn.exe;$(SDK40ToolsPath)x64\sn.exe" />
+        </ItemGroup>
+
+        <!--EPISERVER FORMS SAMPLE package-->
+        <Exec Command="&quot;$(MSBuildProjectDirectory)\node.exe&quot; &quot;$(MSBuildProjectDirectory)\MsbuildCmd.GetVersionString.js&quot; &quot;$(MSBuildProjectDirectory)\..\AssemblyVersion.cs&quot;" ConsoleToMSBuild="true">
+            <Output TaskParameter="ConsoleOutput" PropertyName="VersionStringSamples" />
+        </Exec>
+
+
+        <Copy SourceFiles="@(SamplesConfigFiles)" DestinationFiles="@(SamplesConfigFiles -> '$(SamplesInstallerSourcePath)\Content\modules\_protected\EPiServer.Forms.Samples\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="false" />
+        <Copy SourceFiles="@(SamplesBinFiles)" DestinationFiles="@(SamplesBinFiles -> '$(SamplesInstallerSourcePath)\Lib\%(Filename)%(Extension)')" SkipUnchangedFiles="false" />
+        <Copy SourceFiles="@(SamplesLanguageFiles)" DestinationFiles="@(SamplesLanguageFiles -> '$(SamplesInstallerSourcePath)\Content\modules\_protected\EPiServer.Forms.Samples\EmbeddedLangFiles\%(Filename)%(Extension)')" SkipUnchangedFiles="false" />
+        <Copy SourceFiles="@(SamplesViewFiles)" DestinationFiles="@(SamplesViewFiles -> '$(SamplesInstallerSourcePath)\Content\modules\_protected\EPiServer.Forms.Samples\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="false" />
+        <Copy SourceFiles="@(SamplesMiscRootFiles)" DestinationFiles="@(SamplesMiscRootFiles -> '$(SamplesInstallerSourcePath)\%(Filename)%(Extension)')" SkipUnchangedFiles="false" />
+        <!--These files s hould be in versioned folder for each build-->
+        <Copy SourceFiles="@(SamplesClientResources)" DestinationFiles="@(SamplesClientResources -> '$(SamplesInstallerSourcePath)\Content\modules\_protected\EPiServer.Forms.Samples\$(VersionStringSamples)\ClientResources\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="false" />
+
+        <ReplaceInFile File="$(MSBuildProjectDirectory)\..\module.config"
+           Replace="{VersionString}=$(VersionStringSamples)"
+           TargetFile="$(SamplesInstallerSourcePath)\Content\modules\_protected\EPiServer.Forms.Samples\module.config" />
+        <ReplaceInFile File="$(MSBuildProjectDirectory)\EPiServer.Forms.Samples.nuspec"
+                 Replace="{VersionString}=$(VersionStringSamples)"
+                 TargetFile="$(SamplesNuSpecFile)" />
+
+        <!-- Do the actual nuget packaging -->
+        <!--EPISERVER FORMS SAMPLES package-->
+        <Exec Command="&quot;$(MSBuildNuGetExe)&quot; pack &quot;$(SamplesNuSpecFile)&quot; -BasePath &quot;$(SamplesInstallerSourcePath)&quot; -OutputDirectory &quot;$(OutDir)&quot;" />
+    </Target>
+
+    <!-- ========== main default target, default entry point ========== -->
+    <Target Name="Build" DependsOnTargets="CleanOutput;BuildSolution;BuildLessFiles;BuildPackages" />
+
+</Project>

@@ -1,5 +1,6 @@
 ﻿using EPiServer.DataAnnotations;
 using EPiServer.Forms.Core;
+using EPiServer.Forms.Core.Internal;
 using EPiServer.Forms.Helpers.Internal;
 using EPiServer.Personalization.VisitorGroups;
 using EPiServer.ServiceLocation;
@@ -54,7 +55,7 @@ namespace EPiServer.Forms.Samples.Criteria
         public override bool IsMatch(IPrincipal principal, HttpContextBase httpContext)
         {
             var formGuid = Guid.Parse(Model.SelectedForm);
-            var hasAlreadyPosted = FormsExtensions.HasAlreadyPosted(formGuid, httpContext);
+            var hasAlreadyPosted = HasAlreadyPosted(formGuid, httpContext);
             if (Model.SubmissionStatus == SubmissionStatus.HasSubmitted)
             {
                 return hasAlreadyPosted;
@@ -63,6 +64,23 @@ namespace EPiServer.Forms.Samples.Criteria
             {
                 return !hasAlreadyPosted;
             }
+        }
+
+        /// <summary>
+        /// Check whether current user has already submitted the specified form.
+        /// </summary>
+        /// <param name="formId"></param>
+        /// <param name="httpContext"></param>
+        private bool HasAlreadyPosted(Guid formId, HttpContextBase httpContext)
+        {
+            var psService = ServiceLocator.Current.GetInstance<ProgressiveSubmitInfoService>();
+            var psInfo = psService.GetProgressiveSubmitInfo(formId, httpContext);
+            if (psInfo != null && psInfo.IsFinalized)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

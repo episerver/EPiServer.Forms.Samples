@@ -1897,12 +1897,12 @@
 
             var timePickerHtml = '\
                 <div class="ui-datepicker-title TimePicker">\
-                    <select class="ui-datepicker-hour" data-event="change" data-handler="selectHour">';
+                    <select class="ui-datepicker-hour" data-event="click" data-handler="selectHour">';
             for (var i = 1; i <= 12; i++) {
                 timePickerHtml += '<option value="' + this._formatNumber(i, 2) + '" ' + this._getSelectedAttribute(inst.currentHour, i) + '>' + this._formatNumber(i, 2) + '</option>';
             }
             timePickerHtml += '</select>';
-            timePickerHtml += '<select class="ui-datepicker-minute" data-event="change" data-handler="selectMinute">';
+            timePickerHtml += '<select class="ui-datepicker-minute" data-event="click" data-handler="selectMinute">';
 
             for (var i = 0; i <= 59; i++) {
                 timePickerHtml += '<option value="' + this._formatNumber(i, 2) + '" ' + this._getSelectedAttribute(inst.currentMinute, i) + '>' + this._formatNumber(i, 2) + '</option>';
@@ -1910,7 +1910,7 @@
             timePickerHtml += '</select>';
 
             timePickerHtml += '\
-                    <select class="ui-datepicker-period" data-event="change" data-handler="selectPeriod">\
+                    <select class="ui-datepicker-period" data-event="click" data-handler="selectPeriod">\
                         <option value="AM" ' + this._getSelectedAttribute(inst.currentPeriod, "AM") + '>' + this._get(inst, "amText") + '</option>\
                         <option value="PM" ' + this._getSelectedAttribute(inst.currentPeriod, "PM") + '>' + this._get(inst, "pmText") + '</option>\
                     </select>\

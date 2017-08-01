@@ -135,5 +135,36 @@ namespace EPiServer.Forms.Samples.Implementation.Elements
                new Tuple<string, string>("script", publicVirtualPath + "/ClientResources/ViewMode/DateTimeElementBlock.js")
             };
         }
+
+        /// <summary>
+        /// convert datetime string with format [yyyy-MM-dd hh:mm:ss] -> [yyyy-MM-dd hh:mm tt] OR [hh:mm:ss] -> [hh:mm tt]
+        /// </summary>
+        /// <returns></returns>
+        public override string GetDefaultValue()
+        {
+            var result = base.GetDefaultValue();// datetime string with format [YYYY-MM-DD hh:mm:ss] OR [YYYY-MM-DD] OR [hh:mm:ss]
+
+            if (!string.IsNullOrEmpty(this.GetErrorMessage()))
+            {
+                return result;
+            }
+
+            var pickerType = (DateTimePickerType)this.PickerType;
+            DateTime dateTimeValue;
+            if (!DateTime.TryParse(result, out dateTimeValue))
+            {
+                return result;
+            }
+
+            switch (pickerType)
+            {
+                case DateTimePickerType.TimePicker:
+                    return dateTimeValue.ToString("hh:mm tt");
+                case DateTimePickerType.DateTimePicker:
+                    return dateTimeValue.ToString("yyyy-MM-dd hh:mm tt");
+                default:
+                    return result;
+            }
+        }
     }
 }

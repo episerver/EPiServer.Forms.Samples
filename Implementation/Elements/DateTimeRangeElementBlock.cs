@@ -142,7 +142,11 @@ namespace EPiServer.Forms.Samples.Implementation.Elements
             var isJavaScriptSupport = rawSubmittedData.Get(EPiServer.Forms.Constants.FormWithJavaScriptSupport);
             if (isJavaScriptSupport == null)
             {
-                defaultValue = GetFormattedValue() as string ?? defaultValue;
+                var rangeSegments = GetSubmittedValue() as string[];
+                if (rangeSegments != null)
+                {
+                    defaultValue = rangeSegments.ToStringWithSeparator("|");
+                }
             }
 
             return defaultValue;

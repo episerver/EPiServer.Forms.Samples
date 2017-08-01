@@ -105,8 +105,8 @@ namespace EPiServer.Forms.Samples.Implementation.Elements
             var currentPageLanguage = FormsExtensions.GetCurrentPageLanguage();
             var publicVirtualPath = ModuleHelper.GetPublicVirtualPath(Constants.ModuleName);
             return new List<Tuple<string, string>>() {
-                new Tuple<string, string>("script", string.Format("https://www.google.com/recaptcha/api.js?onload=initRecaptchaElements&render=explicit&hl={0}", currentPageLanguage)),
-                new Tuple<string, string>("script", publicVirtualPath + "/ClientResources/ViewMode/RecaptchaElementBlock.js")
+                new Tuple<string, string>("script", publicVirtualPath + "/ClientResources/ViewMode/RecaptchaElementBlock.js"),
+                new Tuple<string, string>("script", string.Format("https://www.google.com/recaptcha/api.js?onload=initRecaptchaElements&render=explicit&hl={0}", currentPageLanguage))
             };
         }
     }

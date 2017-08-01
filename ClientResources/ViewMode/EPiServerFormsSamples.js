@@ -5,42 +5,42 @@
             // pickerFormat will be used for jQuery datepicker validation,
             // while friendlyFormat will show in validation message for user.
             DateFormats: {
-                "en-US": {
+                "en-us": {
                     "pickerFormat": "mm/dd/yy",
                     "friendlyFormat": "MM/dd/yyyy"
                 },
-                "sv-SE": {
+                "sv-se": {
                     "pickerFormat": "yy-mm-dd",
                     "friendlyFormat": "yyyy-MM-dd"
                 },
-                "nb-NO": {
+                "nb-no": {
                     "pickerFormat": "dd.mm.yy",
                     "friendlyFormat": "dd.MM.yyyy"
                 },
-                "da-DK": {
+                "da-dk": {
                     "pickerFormat": "dd-mm-yy",
                     "friendlyFormat": "dd-MM-yyyy"
                 },
-                "de-DE": {
+                "de-de": {
                     "pickerFormat": "dd.mm.yy",
                     "friendlyFormat": "dd.MM.yyyy"
                 },
-                "nl-NL": {
+                "nl-nl": {
                     "pickerFormat": "d-m-yy",
                     "friendlyFormat": "d-M-yyyy"
                 },
-                "fi-FI": {
+                "fi-fi": {
                     "pickerFormat": "d.m.yy",
                     "friendlyFormat": "d.M.yyyy"
                 },
 
-                "fr-FR": {
+                "fr-fr": {
                     "pickerFormat": "dd/mm/yy",
                     "friendlyFormat": "dd/MM/yyyy"
                 }
             }
         }
-    });    
+    });
 
     var _utilsSvc = epi.EPiServer.Forms.Utils,
         originalGetCustomElementValue = epi.EPiServer.Forms.Extension.getCustomElementValue,
@@ -51,9 +51,9 @@
             dateTimePicker: "datetimepicker"
         },
 
-        language = navigator.language || navigator.userLanguage,
-        dateFormatSettings = epi.EPiServer.Forms.Samples.DateFormats[language],
-        dateFormat = dateFormatSettings ? dateFormatSettings.pickerFormat : $.datetimepicker._defaults.dateFormat,
+        language = navigator.language || navigator.userLanguage, // on iOS naviagtor.language is in lower case (ex: en-us)
+        dateFormatSettings = epi.EPiServer.Forms.Samples.DateFormats[language.toLowerCase()] || epi.EPiServer.Forms.Samples.DateFormats["en-us"],
+        dateFormat = dateFormatSettings.pickerFormat,
 
 
         dateTimeValidate = function (fieldName, fieldValue, validatorMetaData) {
@@ -64,8 +64,8 @@
 
             if (typeof fieldValue === 'object' && fieldValue.isValid == false) {
 
-                var friendlyFormat = dateFormatSettings ? dateFormatSettings.friendlyFormat : $.datetimepicker._defaults.dateFormat,
-                    message = _utilsSvc.stringFormat(validatorMetaData.model.message, [friendlyFormat])
+                var friendlyFormat = dateFormatSettings.friendlyFormat,
+                    message = _utilsSvc.stringFormat(validatorMetaData.model.message, [friendlyFormat]);
 
                 return { isValid: false, message: message };
             }
@@ -92,35 +92,35 @@
             }
 
             var startDateTimeString = values[0],
-                endDateTimeString = values[1];            
-            var startDate = Date.parse(startDateTimeString);
-            var endDate = Date.parse(endDateTimeString);
-            if (startDate >= endDate) {
+                endDateTimeString = values[1];
+            var startDate = Date.parse(epi.EPiServer.Forms.Extension.toISODateTimeString(startDateTimeString));
+            var endDate = Date.parse(epi.EPiServer.Forms.Extension.toISODateTimeString(endDateTimeString));
+            if (!startDate || !endDate || startDate >= endDate) {
                 return { isValid: false, message: validatorMetaData.model.message };
             }
 
             return { isValid: true };
         };
 
-        addressesValidate = function validateAddress(fieldName, fieldValue, validatorMetaData ) {                      
-            var validateEnpoint = '/ExternalValidate/ValidateAddress';
-            var validateResult = { isValid: false };
-            $.ajax({
-                url: validateEnpoint,
-                type: "POST",
-                async: false,
-                data: JSON.parse(fieldValue),
-                dataType: "json",
-                success: function (valid) {
-                    validateResult.isValid = valid;
-                    if (!validateResult.isValid) validateResult.message = validatorMetaData.model.message;
-                },
-                error: function () {
-                    validateResult.isValid = false;
-                }
-            });
-            return validateResult;
-        }
+    addressesValidate = function validateAddress(fieldName, fieldValue, validatorMetaData ) {
+        var validateEnpoint = '/ExternalValidate/ValidateAddress';
+        var validateResult = { isValid: false };
+        $.ajax({
+            url: validateEnpoint,
+            type: "POST",
+            async: false,
+            data: JSON.parse(fieldValue),
+            dataType: "json",
+            success: function (valid) {
+                validateResult.isValid = valid;
+                if (!validateResult.isValid) validateResult.message = validatorMetaData.model.message;
+            },
+            error: function () {
+                validateResult.isValid = false;
+            }
+        });
+        return validateResult;
+    }
 
 
     // extend the EpiForm JavaScript API in ViewMode
@@ -289,7 +289,7 @@
                 }
 
                 else if ($element.hasClass("FormAddressElement")) {
-                   
+
                     var address = $('.FormAddressElement__Address', $element).first().val(),
                         country = $('.FormAddressElement__Country', $element).first().val(),
                         state = $('.FormAddressElement__State', $element).first().val(),
@@ -331,7 +331,7 @@
                         } catch (err) {
                             return { isValid: false };
                         }
-                        var result = _utilsSvc.stringFormat("{0}-{1}-{2}", [dateTime.getFullYear(), dateTime.getMonth() + 1, dateTime.getDate()]);
+                        var result = _utilsSvc.stringFormat("{0}-{1}-{2}", [dateTime.getFullYear(), this.addLeadingZero(dateTime.getMonth() + 1), this.addLeadingZero(dateTime.getDate())]);
                         if (picker.settings.type == dateTimePickerTypes.dateTimePicker) {
                             var dateTimeSegments = dateTimeString.split(" ");
 
@@ -354,16 +354,82 @@
                         if (!_utilsSvc.isMatchedReg(dateTimeString, timeRegex)) {
                             return { isValid: false };
                         }
-                        return "1900-1-1 " + dateTimeString; // add fake date string into return results, this will be ignored when rebind data
+                        return "1900-01-01 " + dateTimeString; // add fake date string into return results, this will be ignored when rebind data
                 }
 
                 return datetime;
             },
 
+            // convert datetime format YYYY-MM-DD hh:mm tt to format YYYY-MM-DDTHH:mmTZD(ISO-8601)
+            // https://www.w3.org/TR/NOTE-datetime
+            toISODateTimeString: function (dateTimeString) {
+
+                if (!dateTimeString) {
+                    return null;
+                }
+
+                var dateTimeSegments = dateTimeString.split(" ");
+                if (dateTimeSegments.length < 3) {
+                    return null;
+                }
+
+                var dateRegex = "^\\d{4}-(0?[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])";
+                var dateString = dateTimeSegments[0];
+                if (!_utilsSvc.isMatchedReg(dateString, dateRegex)) {
+                    return null;
+                }
+
+                var timeRegex = "^(0?[1-9]|1[012])(:[0-5]\\d) [APap][mM]$";
+                var timeString = dateTimeSegments[1] + " " + dateTimeSegments[2];
+                if (!_utilsSvc.isMatchedReg(timeString, timeRegex)) {
+                    return null;
+                }
+
+                return dateTimeSegments[0] + "T" + this.convertTo24Hour(timeString) + this.getTimeZoneDesignator();
+            },
+
+            // convert 12h base to 24h base
+            convertTo24Hour: function (time) {
+                time = time.toLowerCase();
+                var hours = parseInt(time.substr(0, 2));
+                if (time.indexOf("am") !== -1 && hours === 12) {
+                    time = time.replace("12", "00");
+                }
+                if (time.indexOf("pm") !== -1 && hours < 12) {
+                    time = time.replace(this.addLeadingZero(hours), (hours + 12));
+                }
+                return time.replace(/(am|pm)/, "").trim();
+            },
+
+            // get time zone designator TZD based on TimezoneOffset
+            getTimeZoneDesignator: function () {
+                var timeZoneOffset = -(new Date()).getTimezoneOffset(),
+                    dif = timeZoneOffset >= 0 ? "+" : "-";
+
+                timeZoneOffset = Math.abs(timeZoneOffset);
+                return dif + this.addLeadingZero(timeZoneOffset / 60) + ":" + this.addLeadingZero(timeZoneOffset % 60);
+            },
+
+            // add leading zero to number < 10 (Ex: 9 -> 09, 7-> 07)
+            addLeadingZero: function (number) {
+                if (number < 10) {
+                    return "0" + number;
+                }
+                return number;
+            },
+
             // OVERRIDE, custom binding data for date/time/datetime picker and date-time-range picker
             bindCustomElementValue: function ($element, val) {
                 if ($element.hasClass('FormDateTimeRange')) {
+                    // skip binding value for DateTimeRange when it has invalid value
+                    if (typeof val != "string") {
+                        return;
+                    }
                     var values = val.split('|');
+                    if (values && values.length < 2) {
+                        return;
+                    }
+
                     var $startEl = $element.find(".FormDateTimeRange__Start");
                     var $endEl = $element.find(".FormDateTimeRange__End");
                     var startPicker = $.datetimepicker._getInst($startEl[0]),
@@ -401,9 +467,9 @@
                     $addressEl.val(addressInfo.address);
                     return;
                 }
-                
+
                 // if current element is not our job, let others process
-                return originalBindCustomElementValue.apply(this, [$item, val]);
+                return originalBindCustomElementValue.apply(this, [$element, val]);
             }
         }
     });

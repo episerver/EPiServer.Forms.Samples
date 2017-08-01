@@ -6,7 +6,7 @@ using EPiServer.Forms.Samples.Implementation.Elements;
 using EPiServer.Framework.Localization;
 using EPiServer.ServiceLocation;
 using System;
-using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace EPiServer.Forms.Samples.Implementation.Validation
 {
@@ -92,11 +92,17 @@ namespace EPiServer.Forms.Samples.Implementation.Validation
             var pickerType = (datetimeRangeBlock != null) ? (DateTimePickerType)datetimeRangeBlock.PickerType : DateTimePickerType.DateTimePicker;
             switch (pickerType)
             {
+                case DateTimePickerType.TimePicker:
+                    var timeRegex = "^(0?[1-9]|1[012])(:[0-5]\\d) [APap][mM]$";
+                    if (!Regex.IsMatch(submittedValues[0].Replace("1900-01-01 ", string.Empty), timeRegex) || !Regex.IsMatch(submittedValues[1].Replace("1900-01-01 ", string.Empty), timeRegex))
+                    {
+                        return false;
+                    }
+                    break;
                 case DateTimePickerType.DatePicker:
                     return endDateTime.Subtract(startDateTime).TotalDays > 0;
-                default:
-                    return endDateTime.Subtract(startDateTime).TotalSeconds > 0;
             }
+            return endDateTime.Subtract(startDateTime).TotalSeconds > 0;
         }
 
         /// <inheritdoc />
@@ -126,5 +132,26 @@ namespace EPiServer.Forms.Samples.Implementation.Validation
 
     public class DateValidator : DateTimeValidatorBase {}
 
-    public class TimeValidator : DateTimeValidatorBase {}
+    public class TimeValidator : DateTimeValidatorBase
+    {
+        public override bool? Validate(IElementValidatable targetElement)
+        {
+            var submittedValue = targetElement.GetSubmittedValue() as string;
+            if (string.IsNullOrEmpty(submittedValue))
+            {
+                return true;
+            }
+
+            DateTime dateTime;
+            if (!DateTime.TryParse(submittedValue, out dateTime))
+            {
+                return false;
+            }
+
+            var timeRegex = "^(0?[1-9]|1[012])(:[0-5]\\d) [APap][mM]$";
+
+            // when have JS a fake date "1900-01-01 " will be added to submitted value
+            return Regex.IsMatch(submittedValue.Replace("1900-01-01 ", string.Empty), timeRegex);
+        }
+    }
 }
