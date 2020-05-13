@@ -33,8 +33,12 @@
                     "pickerFormat": "d.m.yy",
                     "friendlyFormat": "d.M.yyyy"
                 },
-
                 "fr-fr": {
+                    "pickerFormat": "dd/mm/yy",
+                    "friendlyFormat": "dd/MM/yyyy"
+                },
+
+                "en-gb": {
                     "pickerFormat": "dd/mm/yy",
                     "friendlyFormat": "dd/MM/yyyy"
                 }
