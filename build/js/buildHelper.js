@@ -13,20 +13,15 @@ class BuildHelper {
         this.configuration = this._getConfiguration();
         this.version = this._getVersion();
         this.outDir = path.resolve(outDir);
-        this.formsSamplesOutDir = path.resolve(outDir);
-        this.sourceBasePath = path.resolve("ClientResources/");
+        this.formsSamplesOutDir = path.resolve(outDir + "/EPiServer.Forms.Samples");
+        this.sourceBasePath = path.resolve("src/EPiServer.Forms.Samples/ClientResources/");
     }
 
     /**
      * @returns {"debug"|"release"}
      */
     _getConfiguration() {
-        program.option(
-            "--configuration <configuration>",
-            "Set the build configuration",
-            /^(debug|release)$/i,
-            "debug"
-        ).parseOptions(process.argv);
+        program.option("--configuration <configuration>", "Set the build configuration", /^(debug|release)$/i, "debug").parseOptions(process.argv);
     }
 
     _getVersion() {
@@ -34,31 +29,31 @@ class BuildHelper {
         return version.packageVersion;
     }
 
-  createModuleConfig(source, target, version) {
-    return new Promise(function (resolve, reject) {
-      fs.readFile(source, "utf-8", (err, data) => {
-        if (err) {
-          reject(err);
-        }
-        let xml = xmlpoke(data, (xml) => {
-          xml.set("/module/@clientResourceRelativePath", version);
-        });
+    createModuleConfig(source, target, version) {
+        return new Promise(function(resolve, reject) {
+            fs.readFile(source, "utf-8", (err, data) => {
+                if (err) {
+                    reject(err);
+                }
+                let xml = xmlpoke(data, (xml) => {
+                    xml.set("/module/@clientResourceRelativePath", version);
+                });
 
-        mkdirp(path.dirname(target), (err) => {
-          if (err) {
-            reject(err);
-          }
+                mkdirp(path.dirname(target), (err) => {
+                    if (err) {
+                        reject(err);
+                    }
 
-          fs.writeFile(target, xml, "utf-8", (err) => {
-            if (err) {
-              reject(err);
-            }
-            resolve();
-          });
+                    fs.writeFile(target, xml, "utf-8", (err) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve();
+                    });
+                });
+            });
         });
-      });
-    });
-  }
+    }
 }
 
 module.exports = BuildHelper

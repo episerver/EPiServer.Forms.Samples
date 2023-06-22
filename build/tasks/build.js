@@ -5,8 +5,8 @@ const gulp = require("gulp"),
 
 const tasks = (buildHelper) => {
 
-    var outDir = buildHelper.outDir;
-    var formsSampledir = "./";
+    var outDir = buildHelper.outDir + "/EPiServer.Forms.Samples";
+    var formsSampledir = "./src/EPiServer.Forms.Samples/";
 
     gulp.task("create-moduleconfig", async function() {
         await buildHelper.createModuleConfig(formsSampledir + "module.config", outDir + "/module.config", buildHelper.version);

@@ -200,8 +200,13 @@ Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
+# Packages output folder
+/out
+/nupkgs
+
+# Alloy sample data
+/samples/AlloyMvcTemplates/App_Data
 
 .idea/
-modules/_protected
-out
-nupkgs
+EPiServer.Forms.Samples/modules/_protected
+/src/EPiServer.Forms.Samples/modules/
