@@ -12,8 +12,8 @@ REM Set the build version. Using defaults when no params are given (common when 
 IF "%2"=="" ( SET BUILD=01 ) ELSE ( SET BUILD=%2 )
 IF "%3"=="" ( SET BRANCH=developerbuild ) ELSE ( SET BRANCH=%3 )
 
-CALL npm run build:setversion -- --build %BUILD% --jirabranch %BRANCH%
-IF %errorlevel% NEQ 0 EXIT /B %errorlevel%
+@REM CALL npm run build:setversion -- --build %BUILD% --jirabranch %BRANCH%
+@REM IF %errorlevel% NEQ 0 EXIT /B %errorlevel%
 
 REM Build javascript and less files
 CALL npm run build

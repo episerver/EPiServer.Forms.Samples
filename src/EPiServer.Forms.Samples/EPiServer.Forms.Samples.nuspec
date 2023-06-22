@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>EPiServer.Forms.Samples</id>
+    <version>$Version$</version>
+    <title>EPiServer Forms Samples</title>
+    <authors>EPiServer</authors>
+    <owners>EPiServer</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Binary package of open sourced EPiServer Forms Samples, built from the latest stable release.</description>
+    <copyright>Copyright EPiServer 2015 - 2022</copyright>
+    <repository type="git" url="https://github.com/episerver/content-forms-sample.git"></repository>
+    <releaseNotes>
+        - Update to net6.
+        - Bug fixes.
+    </releaseNotes>
+    <tags>EPiServerModulePackage EPiServerAddon EPiServer Forms Samples CMS12</tags>
+    <dependencies>
+      <group targetFramework="net6.0">
+        <dependency id="EPiServer.Forms" version="[$FormsVersion$,$FormsNextMajorVersion$)" />
+      </group>
+    </dependencies>
+    <contentFiles>
+      <files include="any/any/modules/_protected/EPiServer.Forms.Samples/EPiServer.Forms.Samples.zip" buildAction="None" copyToOutput="true" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="..\..\out\EPiServer.Forms.Samples\EPiServer.Forms.Samples.zip" target="contentFiles\any\any\modules\_protected\EPiServer.Forms.Samples" />
+    <file src="..\..\build\CopyModuleFiles.targets" target="build\net6.0\EPiServer.Forms.Samples.targets" />
+    <file src="..\EPiServer.Forms.Samples\bin\$configuration$\net6.0\EPiServer.Forms.Samples.dll" target="lib\net6.0\" />
+    <file src="..\EPiServer.Forms.Samples\bin\$configuration$\net6.0\EPiServer.Forms.Samples.pdb" target="lib\net6.0\" />
+  </files>
+</package>

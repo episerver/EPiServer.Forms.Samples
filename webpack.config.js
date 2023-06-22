@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = (env, argv) => {
     return {
-        entry: glob.sync("./**/index.tsx").reduce((acc, item) => {
+        entry: glob.sync("./src/**/index.tsx").reduce((acc, item) => {
             const path = item.split("/");
             path.pop();
             const name = path.pop();
@@ -13,7 +13,7 @@ module.exports = (env, argv) => {
         }, {}),
         output: {
             filename: "index.js",
-            path: path.resolve(__dirname, "ClientResources/Criteria/dist/"),
+            path: path.resolve(__dirname, "src/EPiServer.Forms.Samples/ClientResources/Criteria/dist/"),
             libraryTarget: "commonjs" // Must be CommonJS since the modules will be imported using https://github.com/Paciolan/remote-component
         },
         externals: {

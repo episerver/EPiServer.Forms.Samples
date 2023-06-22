@@ -1,10 +1,17 @@
 <Project>
 	<PropertyGroup>
-		<FormVersion>5.3.0</FormVersion>
+		<FormVersion>5.4.0</FormVersion>
+		<CmsCoreVersion>12.13.2</CmsCoreVersion>
 	</PropertyGroup>
-	<ItemGroup>
+	<ItemGroup Condition = "'$(TargetFramework)' != 'net461'">
+		<PackageReference Update="EPiServer.Framework" Version="$(CmsCoreVersion)" />
+		<PackageReference Update="EPiServer.CMS.AspNetCore.Templating" Version="12.8.0"/>
+		<PackageReference Update="EPiServer.CMS" Version="$(CmsCoreVersion)" />
 		<PackageReference Update="EPiServer.Forms" Version="$(FormVersion)" />
+		<PackageReference Update="Microsoft.AspNetCore.OData" Version="8.0.0" />
 		<PackageReference Update="EPiServer.CMS.UI.Core" Version="$(CmsCoreVersion)" />
-		<PackageReference Update="EPiServer.CMS.AspNetCore.Templating" Version="$(CmsCoreVersion)"/>
+		<PackageReference Update="EPiServer.CMS.AspNetCore.HtmlHelpers" Version="$(CmsCoreVersion)" />
+		<PackageReference Update="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.0" />
+		<PackageReference Update="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.80.3" />
 	</ItemGroup>
 </Project>

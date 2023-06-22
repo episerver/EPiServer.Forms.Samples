@@ -11,7 +11,7 @@ const tasks = (buildHelper) => {
         const promise = new Promise((resolve, reject) => {
             const clientResourceBasePath = buildHelper.version + "/ClientResources",
                 outDir = buildHelper.formsSamplesOutDir,
-                formSamplesRootPath = "./",
+                formSamplesRootPath = "./src/EPiServer.Forms.Samples/",
                 zip = () => {
                     const promise = new Promise((resolve, reject) => {
                         let target = fs.createWriteStream(outDir + "/EPiServer.Forms.Samples.zip");
@@ -33,7 +33,7 @@ const tasks = (buildHelper) => {
                     return promise;
                 };
 
-            buildHelper.createModuleConfig("./module.config", outDir + "/module.config", buildHelper.version)
+            buildHelper.createModuleConfig("./src/EPiServer.Forms.Samples/module.config", outDir + "/module.config", buildHelper.version)
                 .then(zip)
                 .then(() => {
                     // Delete generated module file
