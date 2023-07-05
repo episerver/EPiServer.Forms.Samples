@@ -124,12 +124,11 @@
         <description></description>
         <newitemdefaultname>New date time</newitemdefaultname>
         <properties>
-
+          
           <description>
             <caption>Tooltip</caption>
             <help>Displays as a tooltip or help text of an element.</help>
           </description>
-
           <pickertype>
             <caption>Picker type</caption>
             <help>Select picker type for the property.</help>
@@ -198,12 +197,14 @@
         <description></description>
         <newitemdefaultname>New Address</newitemdefaultname>
         <properties>
-
           <description>
             <caption>Tooltip</caption>
             <help>Displays as a tooltip or help text of an element.</help>
           </description>
-
+        <apikey>
+            <caption>Client API Key</caption>
+            <help>Enter client api key from your google cloud console.</help>
+        </apikey>
           <mapwidth>
             <caption>Map width</caption>
             <help>The with of the map associated with the element.</help>

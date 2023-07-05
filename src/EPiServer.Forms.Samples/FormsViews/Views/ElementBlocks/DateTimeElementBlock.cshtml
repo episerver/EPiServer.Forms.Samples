@@ -23,10 +23,9 @@
     <label for="@formElement.Guid" class="Form__Element__Caption">@labelText</label>
     <input name="@formElement.ElementName" id="@formElement.Guid" type="text" class="Form__CustomInput FormDateTime__Input"
            placeholder="@(string.IsNullOrWhiteSpace(Model.PlaceHolder)?"":@Model.PlaceHolder )"
-           data-f-datainput
-           value="@Model.GetDefaultValue()" @Model.AttributesString
+           value="@Model.GetDefaultValue()" 
            aria-invalid="@Util.GetAriaInvalidByValidationCssClasses(cssClasses)"
-           aria-describedby="@Util.GetAriaDescribedByElementName(formElement.ElementName)" />
+           aria-describedby="@Util.GetAriaDescribedByElementName(formElement.ElementName)" data-f-datainput @Html.Raw(Model.AttributesString) />
 
     <span data-epiforms-linked-name="@formElement.ElementName" class="Form__Element__ValidationError" id="@Util.GetAriaDescribedByElementName(formElement.ElementName)"
           style="@(string.IsNullOrEmpty(errorMessage) ? " display:none" : "" )">@errorMessage</span>

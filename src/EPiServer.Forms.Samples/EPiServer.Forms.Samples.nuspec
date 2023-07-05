@@ -17,7 +17,7 @@
     <tags>EPiServerModulePackage EPiServerAddon EPiServer Forms Samples CMS12</tags>
     <dependencies>
       <group targetFramework="net6.0">
-        <dependency id="EPiServer.Forms" version="[$FormsVersion$,$FormsNextMajorVersion$)" />
+        <dependency id="EPiServer.Forms" version="[$FormsVersion$,$FormsNextMajorVersion$)" include="All"/>
       </group>
     </dependencies>
     <contentFiles>

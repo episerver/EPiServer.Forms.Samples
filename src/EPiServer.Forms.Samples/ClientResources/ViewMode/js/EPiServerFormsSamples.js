@@ -119,7 +119,7 @@
                 isValid: true
             };
         },
-        toDateTimeString = function toDateTimeString(string){
+        toDateTimeString = function (string) {
             var arr = string.split(" ");
             // The string only contain date
             if (arr.length == 1) {
@@ -128,35 +128,33 @@
             // The string only contain time
             if (arr.length == 2) {
                 var yearString = new Date().getFullYear();
-                string = epi.EPiServer.Forms.Extension.toISODateTimeString(yearString + "-01-01 " + string)
+                string = yearString + "-01-01 " + string;
             }
             // The string is now contain both date and time
-            return Date.parse(string)
+            return Date.parse(epi.EPiServer.Forms.Extension.toISODateTimeString(string));
+        },
+        addressesValidate = function (fieldName, fieldValue, validatorMetaData) {
+            var validateEnpoint = '/ExternalValidate',
+                validateResult = {
+                    isValid: false
+                };
+
+            $.ajax({
+                url: validateEnpoint,
+                type: "POST",
+                async: false,
+                data: JSON.parse(fieldValue),
+                dataType: "json",
+                success: function (valid) {
+                    validateResult.isValid = valid;
+                    if (!validateResult.isValid) validateResult.message = validatorMetaData.model.message;
+                },
+                error: function () {
+                    validateResult.isValid = false;
+                }
+            });
+            return validateResult;
         };
-    
-
-    addressesValidate = function validateAddress(fieldName, fieldValue, validatorMetaData) {
-        var validateEnpoint = '/ExternalValidate',
-            validateResult = {
-                isValid: false
-            };
-
-        $.ajax({
-            url: validateEnpoint,
-            type: "POST",
-            async: false,
-            data: JSON.parse(fieldValue),
-            dataType: "json",
-            success: function (valid) {
-                validateResult.isValid = valid;
-                if (!validateResult.isValid) validateResult.message = validatorMetaData.model.message;
-            },
-            error: function () {
-                validateResult.isValid = false;
-            }
-        });
-        return validateResult;
-    }
 
 
     // extend the EpiForm JavaScript API in ViewMode
