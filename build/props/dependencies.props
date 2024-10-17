@@ -12,6 +12,5 @@
 		<PackageReference Update="EPiServer.CMS.UI.Core" Version="$(CmsCoreVersion)" />
 		<PackageReference Update="EPiServer.CMS.AspNetCore.HtmlHelpers" Version="$(CmsCoreVersion)" />
 		<PackageReference Update="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.0" />
-		<PackageReference Update="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.80.3" />
 	</ItemGroup>
 </Project>
