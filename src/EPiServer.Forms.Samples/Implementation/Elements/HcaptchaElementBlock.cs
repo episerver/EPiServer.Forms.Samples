@@ -169,13 +169,28 @@ namespace EPiServer.Forms.Samples.Implementation.Elements
             }
         }
 
+        /// <summary>
+        /// Custom script URL for use in certain scenarios, like mainland China. See more here: https://docs.hcaptcha.com/faq/#does-hcaptcha-support-access-by-users-in-china.
+        /// Will use the default URL <see cref="DEFAULT_CLIENT_SCRIPT_URL"/> if not set.
+        /// </summary>
+        [Display(GroupName = SystemTabNames.Settings, Order = -3300)]
+        public virtual string ClientScriptUrl { get; set; }
+
+        private const string DEFAULT_CLIENT_SCRIPT_URL = "https://js.hcaptcha.com/1/api.js";
+
         public IEnumerable<Tuple<string, string>> GetExtraResources()
         {
             return new List<Tuple<string, string>>() {
                 new Tuple<string, string>(
-                    "script", string.Format("https://js.hcaptcha.com/1/api.js")
+                    "script", !string.IsNullOrEmpty(ClientScriptUrl) ? ClientScriptUrl : DEFAULT_CLIENT_SCRIPT_URL
                 )
             };
+        }
+
+        public override void SetDefaultValues(ContentType contentType)
+        {
+            base.SetDefaultValues(contentType);
+            ClientScriptUrl = DEFAULT_CLIENT_SCRIPT_URL;
         }
     }
 }
