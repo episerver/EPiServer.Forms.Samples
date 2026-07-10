@@ -31,9 +31,17 @@
             if (!google || !google.maps.places) {
                 return;
             }
+            
+            // Read configuration from element info
+            var types = (addressElementInfo.customData?.autocompleteTypes || 'address').split(',').map(t => t.trim());
             var options = {
-                types: ['establishment']
+                types: types
             };
+            
+            // Add country restriction if configured
+            if (addressElementInfo.customData?.countryRestriction) {
+                options.componentRestrictions = { country: addressElementInfo.customData.countryRestriction };
+            }
 
             var gPlace = new google.maps.places.Autocomplete(addressEl[0], options);
             google.maps.event.addListener(gPlace, 'place_changed', function () {

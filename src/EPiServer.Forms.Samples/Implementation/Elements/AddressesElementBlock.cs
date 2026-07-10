@@ -100,6 +100,15 @@ namespace EPiServer.Forms.Samples.Implementation.Elements
         [Display(GroupName = SystemTabNames.Content, Order = -6800)]
         public virtual string CountryLabel { get; set; }
 
+        [Display(GroupName = SystemTabNames.Content, Order = -6250)]
+        [UIHint(UIHint.Textarea)]
+        public virtual string AutocompleteTypes { get; set; } = "address";
+        // Options: "address", "establishment", or "address,establishment"
+
+        [Display(GroupName = SystemTabNames.Content, Order = -6260)]
+        public virtual string CountryRestriction { get; set; }
+        // ISO country code (e.g., "au" for Australia, "us" for USA)
+
         /// <summary>
         /// Always use AddressValidator to validate this element
         /// <remarks>hide from EditView</remarks>
@@ -188,6 +197,11 @@ namespace EPiServer.Forms.Samples.Implementation.Elements
         {
             var baseInfo = base.GetElementInfo();
             baseInfo.CustomBinding = true;
+            baseInfo.CustomData = new Dictionary<string, object>
+            {
+                { "autocompleteTypes", AutocompleteTypes ?? "address" },
+                { "countryRestriction", CountryRestriction }
+            };
             return baseInfo;
         }
 
